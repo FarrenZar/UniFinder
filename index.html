@@ -1,0 +1,264 @@
+<!doctype html>
+<html lang="id">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>UniFinder — Cari Universitas</title>
+    <style>
+        :root {
+            --bg: #0f1115;
+            --card: #15171b;
+            --muted: #9aa3b2;
+            --accent: #6ee7b7;
+            --text: #e6eef6;
+        }
+
+        * {
+            box-sizing: border-box
+        }
+
+        body {
+            margin: 0;
+            font-family: Inter, system-ui, Segoe UI, Roboto, Arial;
+            color: var(--text);
+            background: linear-gradient(180deg, #0b0c0f 0%, #0f1115 100%);
+            -webkit-font-smoothing: antialiased
+        }
+
+        .header {
+            padding: 24px;
+            display: flex;
+            gap: 16px;
+            align-items: center;
+            justify-content: space-between
+        }
+
+        .brand {
+            display: flex;
+            gap: 12px;
+            align-items: center
+        }
+
+        .logo {
+            width: 44px;
+            height: 44px;
+            border-radius: 8px;
+            background: linear-gradient(135deg, #0ea5a4, #6ee7b7)
+        }
+
+        h1 {
+            font-size: 18px;
+            margin: 0
+        }
+
+        .controls {
+            display: flex;
+            gap: 12px;
+            align-items: center
+        }
+
+        .search {
+            background: var(--card);
+            border: 1px solid #222;
+            padding: 10px;
+            border-radius: 10px;
+            color: var(--text);
+            min-width: 320px
+        }
+
+        .btn,
+        select {
+            background: #121418;
+            border: 1px solid #26303a;
+            color: var(--text);
+            padding: 8px 12px;
+            border-radius: 8px;
+            cursor: pointer
+        }
+
+        .container {
+            padding: 20px;
+            display: grid;
+            grid-template-columns: 1fr 320px;
+            gap: 20px
+        }
+
+        .list {
+            display: grid;
+            gap: 12px
+        }
+
+        .card {
+            background: var(--card);
+            padding: 14px;
+            border-radius: 12px;
+            border: 1px solid #202428
+        }
+
+        .card h3 {
+            margin: 0 0 6px 0
+        }
+
+        .meta {
+            color: var(--muted);
+            font-size: 13px
+        }
+
+        .sidebar {
+            background: linear-gradient(180deg, #0f1317, #0b0d10);
+            padding: 14px;
+            border-radius: 12px;
+            border: 1px solid #202428
+        }
+
+        .footer {
+            padding: 18px;
+            text-align: center;
+            color: var(--muted);
+            font-size: 13px
+        }
+
+        @media(max-width:900px) {
+            .container {
+                grid-template-columns: 1fr
+            }
+
+            .search {
+                min-width: unset;
+                width: 100%
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header class="header">
+        <div class="brand">
+            <div class="logo"></div>
+            <div>
+                <h1>UniFinder</h1>
+                <div class="meta">Temukan jurusan & universitas terbaik</div>
+            </div>
+        </div>
+        <div class="controls">
+            <input id="q" class="search" placeholder="Cari universitas atau jurusan...">
+            <select id="major" class="btn">
+                <option value="">Semua Jurusan</option>
+            </select>
+            <button id="clear" class="btn">Reset</button>
+        </div>
+    </header>
+
+    <main class="container">
+        <section>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+                <strong>Hasil Pencarian</strong>
+                <select id="sort" class="btn">
+                    <option value="rating">Urut: Rating</option>
+                    <option value="name">Urut: Nama</option>
+                </select>
+            </div>
+            <div id="list" class="list"></div>
+            <div class="footer">© 2026 UniFinder</div>
+        </section>
+
+        <aside class="sidebar">
+            <h4>Filter Jurusan</h4>
+            <div id="majors"></div>
+        </aside>
+    </main>
+
+    <div id="modal"
+        style="display:none;position:fixed;inset:0;background:rgba(2,6,10,0.7);align-items:center;justify-content:center;z-index:50">
+        <div
+            style="background:var(--card);padding:20px;border-radius:14px;max-width:900px;width:92%;border:1px solid #222;display:grid;grid-template-columns:1fr 1fr;gap:16px">
+            <div>
+                <img id="m-img"
+                    style="width:100%;height:220px;object-fit:contain;background:#0b0d10;border-radius:12px;padding:16px" />
+                <iframe id="m-map" style="width:100%;height:220px;border:0;border-radius:12px;margin-top:12px"></iframe>
+            </div>
+            <div>
+                <button id="close" class="btn" style="float:right">Tutup</button>
+                <h2 id="m-title"></h2>
+                <p id="m-desc" class="meta"></p>
+                <p><strong id="m-major"></strong></p>
+                <p class="meta">📍 <span id="m-loc"></span></p>
+                <div style="margin-top:14px;display:flex;gap:10px">
+                    <a id="m-link" class="btn" target="_blank">Website Resmi</a>
+                    <a id="m-map-link" class="btn" target="_blank">Buka Maps</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+
+    <script>
+        const data = [
+            { id: 1, name: "Universitas Indonesia", majors: ["Kedokteran", "Hukum", "Teknik", "Ekonomi"], rating: 4.9, loc: "Depok", desc: "Universitas negeri terbaik dengan fokus riset dan akademik kuat.", url: "https://www.ui.ac.id", img: "https://dsdm.ui.ac.id/wp-content/uploads/2025/06/PERINGKAT-UI.png", map: "https://www.google.com/maps?q=Universitas+Indonesia" },
+            { id: 2, name: "Institut Teknologi Bandung", majors: ["Teknik", "Sains", "Desain"], rating: 4.9, loc: "Bandung", desc: "Institusi unggulan teknologi dan sains di Indonesia.", url: "https://www.itb.ac.id", img: "https://cdn.timesmedia.co.id/images/2021/07/03/ITB.jpg", map: "https://www.google.com/maps?q=Institut+Teknologi+Bandung" },
+            { id: 3, name: "Universitas Gadjah Mada", majors: ["Hukum", "Kedokteran", "Pertanian", "Teknik"], rating: 4.8, loc: "Yogyakarta", desc: "Universitas nasional dengan jurusan paling lengkap.", url: "https://www.ugm.ac.id", img: "https://blog-edutore-partner.s3.ap-southeast-1.amazonaws.com/wp-content/uploads/2020/05/07145748/universitas-gadjah-mada-ugm-yogyakarta-foto-diambil-beberapa-waktu-lalu.jpg", map: "https://www.google.com/maps?q=Universitas+Gadjah+Mada" },
+            { id: 4, name: "Institut Teknologi Sepuluh Nopember", majors: ["Teknik", "Kelautan", "Sains"], rating: 4.7, loc: "Surabaya", desc: "Unggul di bidang teknologi dan maritim.", url: "https://www.its.ac.id", img: "https://uisi.ac.id/assets/upload/article/1280x572/1983f2abad131a858b9e029649cf0fdc.JPG", map: "https://www.google.com/maps?q=Institut+Teknologi+Sepuluh+Nopember" },
+            { id: 5, name: "Universitas Airlangga", majors: ["Kedokteran", "Hukum", "Ekonomi"], rating: 4.7, loc: "Surabaya", desc: "Fokus pada kesehatan, hukum, dan bisnis.", url: "https://www.unair.ac.id", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTsePXwsg8EUSoUF9qx4UhnLdZYOxlGjgEuJw&s", map: "https://www.google.com/maps?q=Universitas+Airlangga" }
+        ];
+
+        const majorsSet = new Set();
+        data.forEach(u => u.majors.forEach(m => majorsSet.add(m)));
+        const majors = Array.from(majorsSet).sort();
+
+        const majorSel = document.getElementById('major');
+        const majorsDiv = document.getElementById('majors');
+        majors.forEach(m => {
+            majorSel.innerHTML += `<option value="${m}">${m}</option>`;
+            majorsDiv.innerHTML += `<label style="display:block;margin:6px 0"><input type="checkbox" value="${m}"> ${m}</label>`;
+        });
+
+        const listEl = document.getElementById('list');
+        const q = document.getElementById('q');
+        const sort = document.getElementById('sort');
+
+        function render() {
+            let arr = data.slice();
+            const term = q.value.toLowerCase();
+            const sel = majorSel.value;
+
+            if (term) arr = arr.filter(u => u.name.toLowerCase().includes(term) || u.majors.join(' ').toLowerCase().includes(term));
+            if (sel) arr = arr.filter(u => u.majors.includes(sel));
+
+            sort.value === 'rating'
+                ? arr.sort((a, b) => b.rating - a.rating)
+                : arr.sort((a, b) => a.name.localeCompare(b.name));
+
+            listEl.innerHTML = arr.map(u => `
+                <div class="card">
+                    <h3>${u.name}</h3>
+                    <div class="meta">${u.majors.join(', ')} • ${u.loc} • ⭐ ${u.rating}</div>
+                    <p>${u.desc}</p>
+                    <button class="btn" onclick="openModal(${u.id})">Detail</button>
+                </div>`).join('') || '<div class="meta">Tidak ada hasil</div>';
+        }
+
+        window.openModal = id => {
+            const u = data.find(x => x.id === id);
+            document.getElementById('m-title').textContent = u.name;
+            document.getElementById('m-desc').textContent = u.desc;
+            document.getElementById('m-major').textContent = "Jurusan: " + u.majors.join(', ');
+            document.getElementById('m-loc').textContent = u.loc;
+            document.getElementById('m-link').href = u.url;
+            document.getElementById('m-img').src = u.img;
+            document.getElementById('m-map').src = u.map.replace('maps?q=', 'maps?q=') + '&output=embed';
+            document.getElementById('m-map-link').href = u.map;
+            document.getElementById('modal').style.display = 'flex';
+        }
+
+        document.getElementById('close').onclick = () => document.getElementById('modal').style.display = 'none';
+        q.addEventListener('input', render);
+        majorSel.addEventListener('change', render);
+        sort.addEventListener('change', render);
+        document.getElementById('clear').onclick = () => { q.value = ''; majorSel.value = ''; render(); };
+
+        render();
+    </script>
+</body>
+
+</html>
