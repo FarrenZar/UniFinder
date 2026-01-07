@@ -5,6 +5,8 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <title>UniFinder — Cari Universitas</title>
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <style>
         :root {
             --bg: #0f1115;
@@ -41,6 +43,35 @@
             align-items: center;
             justify-content: space-between;
             flex-wrap: wrap;
+        }
+
+        /* Hover & interactive details */
+        .card {
+            transition: transform 0.28s ease, box-shadow 0.28s ease, border-color 0.28s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 14px 40px rgba(0, 0, 0, 0.6);
+            border-color: rgba(110, 231, 183, 0.06);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 18px rgba(0, 0, 0, 0.45);
+        }
+
+        .logo {
+            transition: transform 0.25s ease;
+        }
+
+        .logo:hover {
+            transform: scale(1.06);
+        }
+
+        .search:focus {
+            outline: 3px solid rgba(110, 231, 183, 0.12);
+            outline-offset: 2px;
         }
 
         .brand {
@@ -217,7 +248,8 @@
             .brand {
                 width: 100%
             }
-            .brand{
+
+            .brand {
                 margin-left: 0;
             }
 
@@ -253,7 +285,7 @@
 </head>
 
 <body>
-    <header class="header">
+    <header class="header" data-aos="fade-down" data-aos-duration="700">
         <div class="brand">
             <div class="logo"></div>
             <div>
@@ -283,7 +315,7 @@
             <div class="footer">© 2026 UniFinder</div>
         </section>
 
-        <aside class="sidebar">
+        <aside data-aos="fade-down" data-aos-duration="1000" class="sidebar">
             <h4>Filter Jurusan</h4>
             <div id="majors"></div>
         </aside>
@@ -349,13 +381,14 @@
                 ? arr.sort((a, b) => b.rating - a.rating)
                 : arr.sort((a, b) => a.name.localeCompare(b.name));
 
-            listEl.innerHTML = arr.map(u => `
-                <div class="card">
+            listEl.innerHTML = arr.map((u, i) => `
+                <div class="card" data-aos="fade-up" data-aos-duration="700" data-aos-delay="${(i % 8) * 70}">
                     <h3>${u.name}</h3>
                     <div class="meta">${u.majors.join(', ')} • ${u.loc} • ⭐ ${u.rating}</div>
                     <p>${u.desc}</p>
                     <button class="btn" onclick="openModal(${u.id})">Detail</button>
                 </div>`).join('') || '<div class="meta">Tidak ada hasil</div>';
+            if (window.AOS) AOS.refresh();
         }
 
         window.openModal = id => {
@@ -378,6 +411,11 @@
         document.getElementById('clear').onclick = () => { q.value = ''; majorSel.value = ''; render(); };
 
         render();
+
+        // Initialize AOS (animations on scroll) after initial render
+        if (window.AOS) {
+            AOS.init({ once: true, duration: 650, offset: 120, easing: 'ease-out-cubic' });
+        }
     </script>
 </body>
 
