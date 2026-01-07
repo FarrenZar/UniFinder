@@ -15,56 +15,74 @@
         }
 
         * {
-            box-sizing: border-box
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
         }
 
         body {
-            margin: 0;
-            font-family: Inter, system-ui, Segoe UI, Roboto, Arial;
+            font-family: Inter, system-ui, 'Segoe UI', Roboto, Arial, sans-serif;
             color: var(--text);
             background: linear-gradient(180deg, #0b0c0f 0%, #0f1115 100%);
-            -webkit-font-smoothing: antialiased
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
 
         .header {
-            padding: 24px;
+            padding: 18px 16px;
             display: flex;
-            gap: 16px;
+            gap: 12px;
             align-items: center;
-            justify-content: space-between
+            justify-content: space-between;
+            flex-wrap: wrap;
         }
 
         .brand {
             display: flex;
             gap: 12px;
-            align-items: center
+            align-items: center;
+            min-width: 0;
+            margin-left: 10.5%;
         }
 
         .logo {
             width: 44px;
             height: 44px;
             border-radius: 8px;
-            background: linear-gradient(135deg, #0ea5a4, #6ee7b7)
+            background: linear-gradient(135deg, #0ea5a4, #6ee7b7);
+            flex: 0 0 44px
         }
 
         h1 {
             font-size: 18px;
-            margin: 0
+            margin: 0;
+            line-height: 1
         }
 
         .controls {
             display: flex;
-            gap: 12px;
-            align-items: center
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+            min-width: 0;
+            margin-right: 10.5%;
         }
 
         .search {
             background: var(--card);
             border: 1px solid #222;
-            padding: 10px;
+            padding: 10px 12px;
             border-radius: 10px;
             color: var(--text);
-            min-width: 320px
+            min-width: 0;
+            width: 100%;
+            max-width: 520px;
         }
 
         .btn,
@@ -72,16 +90,19 @@
             background: #121418;
             border: 1px solid #26303a;
             color: var(--text);
-            padding: 8px 12px;
+            padding: 10px 12px;
             border-radius: 8px;
-            cursor: pointer
+            cursor: pointer;
+            white-space: nowrap
         }
 
         .container {
-            padding: 20px;
+            padding: 16px;
             display: grid;
-            grid-template-columns: 1fr 320px;
-            gap: 20px
+            grid-template-columns: 1fr 300px;
+            gap: 16px;
+            max-width: 1200px;
+            margin: 0 auto
         }
 
         .list {
@@ -119,14 +140,113 @@
             font-size: 13px
         }
 
-        @media(max-width:900px) {
+        /* Modal */
+        #modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(2, 6, 10, 0.7);
+            align-items: center;
+            justify-content: center;
+            z-index: 50
+        }
+
+        #modal .modal-inner {
+            background: var(--card);
+            padding: 20px;
+            border-radius: 14px;
+            max-width: 900px;
+            width: 92%;
+            border: 1px solid #222;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px
+        }
+
+        #modal img,
+        #modal iframe {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            border-radius: 12px
+        }
+
+        /* Tablet and smaller */
+        @media (max-width: 900px) {
             .container {
                 grid-template-columns: 1fr
             }
 
             .search {
-                min-width: unset;
+                max-width: none
+            }
+
+            .controls {
                 width: 100%
+            }
+
+            .btn {
+                flex: 0 0 auto
+            }
+        }
+
+        /* Mobile target: 756px and below */
+        @media (max-width: 756px) {
+            .header {
+                padding: 14px 12px
+            }
+
+            .brand {
+                gap: 10px
+            }
+
+            .logo {
+                width: 40px;
+                height: 40px
+            }
+
+            h1 {
+                font-size: 16px
+            }
+
+            .controls {
+                justify-content: flex-end
+            }
+
+            .controls,
+            .brand {
+                width: 100%
+            }
+            .brand{
+                margin-left: 0;
+            }
+
+            .controls {
+                order: 2;
+                gap: 8px;
+                margin-right: 0;
+            }
+
+            /* modal becomes single column */
+            #modal .modal-inner {
+                grid-template-columns: 1fr;
+                padding: 14px
+            }
+        }
+
+        @media (max-width: 420px) {
+            .header {
+                padding: 12px
+            }
+
+            .search {
+                font-size: 14px
+            }
+
+            .btn,
+            select {
+                padding: 10px;
+                font-size: 14px
             }
         }
     </style>
@@ -160,7 +280,7 @@
                 </select>
             </div>
             <div id="list" class="list"></div>
-            <div class="footer">© 2026 UniFinder - Farren STAG</div>
+            <div class="footer">© 2026 UniFinder</div>
         </section>
 
         <aside class="sidebar">
@@ -260,6 +380,5 @@
         render();
     </script>
 </body>
-
 
 </html>
